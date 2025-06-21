@@ -1,0 +1,177 @@
+<% content_for :title, "Upload File - PaperVault" %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Upload File</h1>
+    <p class="text-gray-600">Upload files to your PaperVault storage</p>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <%= form_with model: @document, local: true, class: "space-y-6", html: { multipart: true } do |f| %>
+      <% if @document.errors.any? %>
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-exclamation-triangle text-red-400"></i>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">
+                <%= pluralize(@document.errors.count, "error") %> prohibited this file from being uploaded:
+              </h3>
+              <div class="mt-2 text-sm text-red-700">
+                <ul class="list-disc pl-5 space-y-1">
+                  <% @document.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div>
+        <label for="document_name" class="block text-sm font-medium text-gray-700 mb-2">
+          File Name (Optional)
+        </label>
+        <%= f.text_field :name, 
+            class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500",
+            placeholder: "Leave blank to use original filename" %>
+        <p class="mt-1 text-sm text-gray-500">If left blank, the original filename will be used</p>
+      </div>
+
+      <% if @folder %>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Upload to Folder
+          </label>
+          <div class="flex items-center p-3 bg-gray-50 rounded-md">
+            <i class="fas fa-folder text-yellow-500 mr-3"></i>
+            <span class="text-gray-900"><%= @folder.name %></span>
+          </div>
+          <%= f.hidden_field :folder_id, value: @folder.id %>
+        </div>
+      <% end %>
+
+      <div>
+        <label for="document_file" class="block text-sm font-medium text-gray-700 mb-2">
+          Select File
+        </label>
+        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors" id="drop-zone">
+          <div class="space-y-1 text-center">
+            <i class="fas fa-cloud-upload-alt text-gray-400 text-4xl mb-4"></i>
+            <div class="flex text-sm text-gray-600">
+              <label for="document_file" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                <span>Upload a file</span>
+                <%= f.file_field :file, 
+                    class: "sr-only",
+                    accept: "image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip",
+                    required: true %>
+              </label>
+              <p class="pl-1">or drag and drop</p>
+            </div>
+            <p class="text-xs text-gray-500">
+              PNG, JPG, PDF, DOC, XLS, PPT, TXT, CSV, ZIP up to 100MB
+            </p>
+          </div>
+        </div>
+        <div id="file-info" class="mt-2 hidden">
+          <div class="flex items-center p-3 bg-blue-50 rounded-md">
+            <i class="fas fa-file text-blue-500 mr-3"></i>
+            <div>
+              <p class="text-sm font-medium text-blue-900" id="file-name"></p>
+              <p class="text-xs text-blue-700" id="file-size"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+        <%= link_to "Cancel", documents_path, 
+            class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+        <%= f.submit "Upload File", 
+            class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const fileInput = document.getElementById('document_file');
+  const dropZone = document.getElementById('drop-zone');
+  const fileInfo = document.getElementById('file-info');
+  const fileName = document.getElementById('file-name');
+  const fileSize = document.getElementById('file-size');
+
+  // Prevent default drag behaviors
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, preventDefaults, false);
+    document.body.addEventListener(eventName, preventDefaults, false);
+  });
+
+  // Highlight drop zone when item is dragged over it
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, highlight, false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, unhighlight, false);
+  });
+
+  // Handle dropped files
+  dropZone.addEventListener('drop', handleDrop, false);
+
+  // Handle file selection via input
+  fileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      showFileInfo(file);
+    }
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  function highlight(e) {
+    dropZone.classList.add('border-blue-400', 'bg-blue-50');
+  }
+
+  function unhighlight(e) {
+    dropZone.classList.remove('border-blue-400', 'bg-blue-50');
+  }
+
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    
+    if (files.length > 0) {
+      fileInput.files = files;
+      showFileInfo(files[0]);
+    }
+  }
+
+  function showFileInfo(file) {
+    console.log('Showing file info for:', file.name); // Debug log
+    fileName.textContent = file.name;
+    fileSize.textContent = formatFileSize(file.size);
+    fileInfo.classList.remove('hidden');
+    
+    // Also update the file name field if it's empty
+    const nameField = document.getElementById('document_name');
+    if (nameField && nameField.value === '') {
+      nameField.value = file.name;
+    }
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+});
+</script> 

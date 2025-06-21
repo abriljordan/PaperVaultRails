@@ -1,0 +1,68 @@
+<% content_for :title, "Folders - PaperVault" %>
+
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Folders</h1>
+      <p class="text-gray-600">Organize your files with folders</p>
+    </div>
+    <div class="flex space-x-3">
+      <%= link_to new_folder_path, class: "bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors" do %>
+        <i class="fas fa-folder-plus mr-2"></i>New Folder
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Folders Grid -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-medium text-gray-900">My Folders</h2>
+    </div>
+    <div class="p-6">
+      <% if @folders.any? %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <% @folders.each do |folder| %>
+            <%= render 'folder', folder: folder %>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="text-center py-12">
+          <i class="fas fa-folder text-gray-400 text-6xl mb-4"></i>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">No folders yet</h3>
+          <p class="text-gray-500 mb-6">Create your first folder to start organizing your files</p>
+          <%= link_to new_folder_path, class: "bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors" do %>
+            <i class="fas fa-folder-plus mr-2"></i>Create Folder
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Shared Folders -->
+  <% if @shared_folders.any? %>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-medium text-gray-900">Shared with Me</h2>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <% @shared_folders.each do |folder| %>
+            <div class="group relative bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-folder text-yellow-500 text-3xl"></i>
+                </div>
+                <div class="ml-3 min-w-0 flex-1">
+                  <p class="text-sm font-medium text-gray-900 truncate"><%= folder.name %></p>
+                  <p class="text-xs text-gray-500">Shared by <%= folder.user.name %></p>
+                  <p class="text-xs text-gray-500"><%= folder.document_count %> items</p>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div> 

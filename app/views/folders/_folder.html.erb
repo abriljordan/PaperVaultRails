@@ -1,0 +1,44 @@
+<%= link_to folder_path(folder), class: "block group relative bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow" do %>
+  <div class="flex items-center">
+    <div class="flex-shrink-0">
+      <i class="fas fa-folder text-3xl" style="color: <%= folder.color %>"></i>
+    </div>
+    <div class="ml-3 min-w-0 flex-1">
+      <p class="text-sm font-medium text-gray-900 truncate"><%= folder.name %></p>
+      <p class="text-xs text-gray-500"><%= folder.document_count %> items</p>
+      <p class="text-xs text-gray-500"><%= number_to_human_size(folder.total_size) %></p>
+    </div>
+  </div>
+<% end %>
+
+<!-- Hover actions -->
+<div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+  <div class="flex space-x-1">
+    <% if folder.is_starred? %>
+      <%= link_to unstar_folder_path(folder), 
+          method: :patch, 
+          class: "text-yellow-500 hover:text-yellow-600 p-1",
+          data: { turbo_method: :patch } do %>
+        <i class="fas fa-star text-sm"></i>
+      <% end %>
+    <% else %>
+      <%= link_to star_folder_path(folder), 
+          method: :patch, 
+          class: "text-gray-400 hover:text-yellow-500 p-1",
+          data: { turbo_method: :patch } do %>
+        <i class="far fa-star text-sm"></i>
+      <% end %>
+    <% end %>
+    
+    <%= link_to share_folder_path(folder), class: "text-gray-400 hover:text-blue-600 p-1" do %>
+      <i class="fas fa-share-alt text-sm"></i>
+    <% end %>
+    
+    <div class="relative">
+      <button class="text-gray-400 hover:text-gray-600 p-1">
+        <i class="fas fa-ellipsis-v text-sm"></i>
+      </button>
+      <!-- Dropdown menu would go here -->
+    </div>
+  </div>
+</div> 

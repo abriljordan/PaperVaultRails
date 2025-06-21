@@ -1,0 +1,81 @@
+<% content_for :title, "Share Folder - PaperVault" %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Share Folder</h1>
+    <p class="text-gray-600">Share "<%= @folder.name %>" with other users</p>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <!-- Current Shares -->
+    <% if @folder.folder_shares.any? %>
+      <div class="mb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Currently Shared With</h3>
+        <div class="space-y-3">
+          <% @folder.folder_shares.includes(:user).each do |share| %>
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center">
+                <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=<%= share.user.name %>&background=4285f4&color=fff" alt="">
+                <div class="ml-3">
+                  <p class="text-sm font-medium text-gray-900"><%= share.user.name %></p>
+                  <p class="text-sm text-gray-500"><%= share.user.email %></p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= share.permission == 'edit' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' %>">
+                  <%= share.permission.titleize %>
+                </span>
+                <%= link_to folder_folder_share_path(@folder, share), 
+                    method: :delete,
+                    data: { confirm: "Remove access for #{share.user.name}?" },
+                    class: "text-red-600 hover:text-red-800" do %>
+                  <i class="fas fa-times"></i>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- New Share Form -->
+    <div class="border-t border-gray-200 pt-6">
+      <h3 class="text-lg font-medium text-gray-900 mb-4">Share with New User</h3>
+      
+      <%= form_with model: [@folder, @share], local: true, class: "space-y-4" do |f| %>
+        <div>
+          <label for="folder_share_email" class="block text-sm font-medium text-gray-700 mb-2">
+            Email Address
+          </label>
+          <%= f.email_field :email, 
+              class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500",
+              placeholder: "Enter user's email address",
+              required: true %>
+        </div>
+
+        <div>
+          <label for="folder_share_permission" class="block text-sm font-medium text-gray-700 mb-2">
+            Permission Level
+          </label>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <%= f.radio_button :permission, 'view', class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" %>
+              <span class="ml-2 text-sm text-gray-700">View only - Can view files and folders</span>
+            </label>
+            <label class="flex items-center">
+              <%= f.radio_button :permission, 'edit', class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" %>
+              <span class="ml-2 text-sm text-gray-700">Can edit - Can add, edit, and delete files</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-4">
+          <%= link_to "Cancel", folder_path(@folder), 
+              class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+          <%= f.submit "Share Folder", 
+              class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div> 

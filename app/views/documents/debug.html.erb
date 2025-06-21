@@ -1,0 +1,56 @@
+<% content_for :title, "Debug Upload - PaperVault" %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Debug File Upload</h1>
+    <p class="text-gray-600">Testing file upload functionality</p>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-semibold mb-4">Simple Upload Form</h2>
+    
+    <%= form_with model: @document, local: true, class: "space-y-6", html: { multipart: true } do |f| %>
+      <% if @document.errors.any? %>
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <h3 class="text-sm font-medium text-red-800">
+            <%= pluralize(@document.errors.count, "error") %> occurred:
+          </h3>
+          <div class="mt-2 text-sm text-red-700">
+            <ul class="list-disc pl-5 space-y-1">
+              <% @document.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+
+      <div>
+        <label for="document_file" class="block text-sm font-medium text-gray-700 mb-2">
+          Select File
+        </label>
+        <%= f.file_field :file, 
+            class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100",
+            required: true %>
+      </div>
+
+      <div class="flex justify-end space-x-3">
+        <%= link_to "Back", documents_path, 
+            class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+        <%= f.submit "Upload", 
+            class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-6 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-semibold mb-4">Debug Information</h2>
+    <div class="space-y-2 text-sm">
+      <p><strong>Storage Service:</strong> <%= Rails.application.config.active_storage.service %></p>
+      <p><strong>Storage Root:</strong> <%= Rails.application.config.active_storage.service_configurations[Rails.application.config.active_storage.service.to_sym][:root] %></p>
+      <p><strong>Current User:</strong> <%= current_user.email if user_signed_in? %></p>
+      <p><strong>Storage Used:</strong> <%= number_to_human_size(current_user.total_storage_used) if user_signed_in? %></p>
+      <p><strong>Storage Limit:</strong> <%= number_to_human_size(current_user.storage_limit) if user_signed_in? %></p>
+    </div>
+  </div>
+</div> 

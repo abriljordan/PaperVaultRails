@@ -1,0 +1,74 @@
+<% content_for :title, "Sign Up - PaperVault" %>
+
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <div>
+      <div class="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100">
+        <i class="fas fa-cloud text-blue-600 text-2xl"></i>
+      </div>
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        Create your account
+      </h2>
+      <p class="mt-2 text-center text-sm text-gray-600">
+        Start storing and sharing your files securely
+      </p>
+    </div>
+    
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "mt-8 space-y-6" }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <div class="rounded-md shadow-sm -space-y-px">
+        <div>
+          <label for="user_name" class="sr-only">Full name</label>
+          <%= f.text_field :name, autocomplete: "name", required: true,
+              class: "appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm",
+              placeholder: "Full name" %>
+        </div>
+        <div>
+          <label for="user_email" class="sr-only">Email address</label>
+          <%= f.email_field :email, autocomplete: "email", required: true,
+              class: "appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm",
+              placeholder: "Email address" %>
+        </div>
+        <div>
+          <label for="user_password" class="sr-only">Password</label>
+          <%= f.password_field :password, autocomplete: "new-password", required: true,
+              class: "appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm",
+              placeholder: "Password (#{@minimum_password_length} characters minimum)" %>
+        </div>
+        <div>
+          <label for="user_password_confirmation" class="sr-only">Confirm password</label>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password", required: true,
+              class: "appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm",
+              placeholder: "Confirm password" %>
+        </div>
+      </div>
+
+      <div>
+        <%= f.submit "Create account", class: "group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+      </div>
+    <% end %>
+
+    <div class="text-center">
+      <p class="text-sm text-gray-600">
+        Already have an account?
+        <%= link_to "Sign in", new_session_path(resource_name), class: "font-medium text-blue-600 hover:text-blue-500" %>
+      </p>
+    </div>
+
+    <div class="mt-6">
+      <div class="relative">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-300" />
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-gray-50 text-gray-500">By signing up, you agree to our</span>
+        </div>
+      </div>
+      <div class="mt-2 text-center text-xs text-gray-500">
+        <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a> and 
+        <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,220 @@
+<% content_for :title, "My Drive - PaperVault" %>
+
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">My Drive</h1>
+      <p class="text-gray-600">Store, organize, and share your files</p>
+    </div>
+    <div class="flex space-x-3">
+      <%= link_to new_document_path, class: "bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center" do %>
+        <i class="fas fa-upload mr-2"></i>Upload
+      <% end %>
+      <%= link_to new_folder_path, class: "bg-white text-gray-700 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors inline-flex items-center" do %>
+        <i class="fas fa-folder-plus mr-2"></i>New Folder
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div class="flex items-center">
+        <div class="p-2 bg-blue-100 rounded-lg">
+          <i class="fas fa-folder text-blue-600"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-600">Folders</p>
+          <p class="text-lg font-semibold text-gray-900"><%= @folders.count %></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div class="flex items-center">
+        <div class="p-2 bg-green-100 rounded-lg">
+          <i class="fas fa-file text-green-600"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-600">Files</p>
+          <p class="text-lg font-semibold text-gray-900"><%= @documents.count %></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div class="flex items-center">
+        <div class="p-2 bg-purple-100 rounded-lg">
+          <i class="fas fa-share-alt text-purple-600"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-600">Shared</p>
+          <p class="text-lg font-semibold text-gray-900"><%= @shared_folders.count + @shared_documents.count %></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div class="flex items-center">
+        <div class="p-2 bg-yellow-100 rounded-lg">
+          <i class="fas fa-star text-yellow-600"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-600">Starred</p>
+          <p class="text-lg font-semibold text-gray-900"><%= @starred_items.count %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Files -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-medium text-gray-900">Recent Files</h2>
+    </div>
+    <div class="divide-y divide-gray-200">
+      <% if @recent_documents.any? %>
+        <% @recent_documents.each do |document| %>
+          <div class="px-6 py-4 hover:bg-gray-50">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <% if document.is_image? %>
+                    <i class="fas fa-image text-green-600 text-xl"></i>
+                  <% elsif document.is_pdf? %>
+                    <i class="fas fa-file-pdf text-red-600 text-xl"></i>
+                  <% elsif document.is_document? %>
+                    <i class="fas fa-file-word text-blue-600 text-xl"></i>
+                  <% elsif document.is_spreadsheet? %>
+                    <i class="fas fa-file-excel text-green-600 text-xl"></i>
+                  <% elsif document.is_presentation? %>
+                    <i class="fas fa-file-powerpoint text-orange-600 text-xl"></i>
+                  <% else %>
+                    <i class="fas fa-file text-gray-600 text-xl"></i>
+                  <% end %>
+                </div>
+                <div class="ml-4">
+                  <p class="text-sm font-medium text-gray-900"><%= document.name %></p>
+                  <p class="text-sm text-gray-500"><%= number_to_human_size(document.file_size) %> • <%= time_ago_in_words(document.updated_at) %> ago</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <% if document.is_starred? %>
+                  <%= link_to unstar_document_path(document), method: :patch, class: "text-yellow-500 hover:text-yellow-600", data: { turbo_method: :patch } do %>
+                    <i class="fas fa-star"></i>
+                  <% end %>
+                <% else %>
+                  <%= link_to star_document_path(document), method: :patch, class: "text-gray-400 hover:text-yellow-500", data: { turbo_method: :patch } do %>
+                    <i class="far fa-star"></i>
+                  <% end %>
+                <% end %>
+                <div class="relative">
+                  <button class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-ellipsis-v"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="px-6 py-8 text-center">
+          <i class="fas fa-file text-gray-400 text-4xl mb-4"></i>
+          <p class="text-gray-500">No files yet. Upload your first file to get started!</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Folders and Files Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- My Folders -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <h2 class="text-lg font-medium text-gray-900">My Folders</h2>
+        <%= link_to folders_path, class: "text-blue-600 hover:text-blue-700 text-sm" do %>
+          View all
+        <% end %>
+      </div>
+      <div class="p-6">
+        <% if @folders.any? %>
+          <div class="grid grid-cols-2 gap-4">
+            <% @folders.limit(6).each do |folder| %>
+              <%= link_to folder_path(folder), class: "flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors" do %>
+                <div class="flex-shrink-0">
+                  <i class="fas fa-folder text-2xl" style="color: <%= folder.color %>"></i>
+                </div>
+                <div class="ml-3 min-w-0 flex-1">
+                  <p class="text-sm font-medium text-gray-900 truncate"><%= folder.name %></p>
+                  <p class="text-xs text-gray-500"><%= folder.document_count %> items</p>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="text-center py-8">
+            <i class="fas fa-folder text-gray-400 text-4xl mb-4"></i>
+            <p class="text-gray-500">No folders yet. Create your first folder!</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Shared with Me -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-medium text-gray-900">Shared with Me</h2>
+      </div>
+      <div class="p-6">
+        <% if @shared_folders.any? || @shared_documents.any? %>
+          <div class="space-y-3">
+            <% @shared_folders.limit(3).each do |folder| %>
+              <%= link_to folder_path(folder), class: "flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors" do %>
+                <i class="fas fa-folder text-yellow-500 mr-3"></i>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium text-gray-900 truncate"><%= folder.name %></p>
+                  <p class="text-xs text-gray-500">Shared by <%= folder.user.name %></p>
+                </div>
+              <% end %>
+            <% end %>
+            
+            <% @shared_documents.limit(3).each do |document| %>
+              <%= link_to document_path(document), class: "flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors" do %>
+                <i class="fas fa-file text-gray-600 mr-3"></i>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium text-gray-900 truncate"><%= document.name %></p>
+                  <p class="text-xs text-gray-500">Shared by <%= document.user.name %></p>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="text-center py-8">
+            <i class="fas fa-share-alt text-gray-400 text-4xl mb-4"></i>
+            <p class="text-gray-500">No shared items yet.</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Storage Usage -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-medium text-gray-900">Storage Usage</h2>
+    </div>
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-sm font-medium text-gray-700">Used Storage</span>
+        <span class="text-sm text-gray-500"><%= number_to_human_size(@storage_usage[:used]) %> of <%= number_to_human_size(@storage_usage[:limit]) %></span>
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-3">
+        <div class="bg-blue-600 h-3 rounded-full transition-all duration-300" style="width: <%= @storage_usage[:percentage] %>%"></div>
+      </div>
+      <div class="mt-2 text-xs text-gray-500">
+        <%= @storage_usage[:percentage] %>% used
+      </div>
+    </div>
+  </div>
+</div> 
