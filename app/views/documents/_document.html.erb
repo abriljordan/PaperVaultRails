@@ -1,6 +1,6 @@
-<div id="document_<%= document.id %>" class="px-6 py-4 hover:bg-gray-50">
+<div id="<%= dom_id document %>" class="relative group px-6 py-4 hover:bg-gray-50">
   <div class="flex items-center justify-between">
-    <div class="flex items-center">
+    <div class="flex items-center flex-grow min-w-0">
       <div class="flex-shrink-0">
         <% if document.is_image? %>
           <i class="fas fa-image text-green-600 text-xl"></i>
@@ -16,47 +16,71 @@
           <i class="fas fa-file text-gray-600 text-xl"></i>
         <% end %>
       </div>
-      <div class="ml-4">
-        <p class="text-sm font-medium text-gray-900"><%= document.name %></p>
-        <p class="text-sm text-gray-500">
+      <div class="ml-4 min-w-0">
+        <p class="text-sm font-medium text-gray-900 truncate"><%= document.name %></p>
+        <p class="text-sm text-gray-500 truncate">
           <%= number_to_human_size(document.file_size) %> • 
-          <%= time_ago_in_words(document.updated_at) %> ago
+          Updated <%= time_ago_in_words(document.updated_at) %> ago
           <% if document.folder %>
             • In <%= document.folder.name %>
           <% end %>
         </p>
       </div>
     </div>
-    <div class="flex items-center space-x-2">
-      <%= link_to download_document_path(document), class: "text-gray-400 hover:text-blue-600" do %>
+    <div class="flex-shrink-0 flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      <%= link_to download_document_path(document), class: "text-gray-400 hover:text-blue-600 p-1", title: "Download" do %>
         <i class="fas fa-download"></i>
       <% end %>
       
       <% if document.is_starred? %>
         <%= link_to unstar_document_path(document), 
-            method: :patch, 
-            class: "text-yellow-500 hover:text-yellow-600",
-            data: { turbo_method: :patch } do %>
+            class: "text-yellow-500 hover:text-yellow-600 p-1",
+            data: { "turbo-method": :patch }, title: "Unstar" do %>
           <i class="fas fa-star"></i>
         <% end %>
       <% else %>
         <%= link_to star_document_path(document), 
-            method: :patch, 
-            class: "text-gray-400 hover:text-yellow-500",
-            data: { turbo_method: :patch } do %>
+            class: "text-gray-400 hover:text-yellow-500 p-1",
+            data: { "turbo-method": :patch }, title: "Star" do %>
           <i class="far fa-star"></i>
         <% end %>
       <% end %>
       
-      <%= link_to share_document_path(document), class: "text-gray-400 hover:text-blue-600" do %>
+      <%= link_to share_document_path(document), class: "text-gray-400 hover:text-blue-600 p-1", title: "Share" do %>
         <i class="fas fa-share-alt"></i>
       <% end %>
       
       <div class="relative">
-        <button class="text-gray-400 hover:text-gray-600">
+        <button type="button" class="text-gray-400 hover:text-gray-600 p-1 document-menu-button" data-document-id="<%= document.id %>">
           <i class="fas fa-ellipsis-v"></i>
         </button>
-        <!-- Dropdown menu would go here -->
+        <!-- Dropdown menu -->
+        <div class="hidden fixed w-48 bg-white rounded-md shadow-lg border border-gray-200 z-[9999] document-menu-dropdown" data-document-id="<%= document.id %>">
+          <div class="py-1">
+            <%= link_to document_path(document), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" do %>
+              <i class="fas fa-eye mr-3 text-gray-400"></i>
+              View Details
+            <% end %>
+            <%= link_to download_document_path(document), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" do %>
+              <i class="fas fa-download mr-3 text-gray-400"></i>
+              Download
+            <% end %>
+            <%= link_to share_document_path(document), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" do %>
+              <i class="fas fa-share-alt mr-3 text-gray-400"></i>
+              Share
+            <% end %>
+            <hr class="my-1">
+            <%= link_to document_path(document), 
+                class: "block px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center",
+                data: { 
+                  "turbo-method": :delete,
+                  "turbo-confirm": "Are you sure you want to delete '#{document.name}'?"
+                } do %>
+              <i class="fas fa-trash mr-3"></i>
+              Delete
+            <% end %>
+          </div>
+        </div>
       </div>
     </div>
   </div>

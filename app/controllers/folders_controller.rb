@@ -44,8 +44,14 @@ class FoldersController < ApplicationController
   end
 
   def destroy
+    parent = @folder.parent
     @folder.destroy
-    redirect_to folders_path, notice: 'Folder deleted successfully.'
+    
+    respond_to do |format|
+      format.html { redirect_to parent || folders_path, notice: 'Folder deleted successfully.' }
+      format.turbo_stream { render turbo_stream: turbo_stream.remove(@folder) }
+      format.json { head :no_content }
+    end
   end
 
   def star

@@ -15,13 +15,13 @@
   </div>
 
   <!-- Folders Grid -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-visible">
     <div class="px-6 py-4 border-b border-gray-200">
       <h2 class="text-lg font-medium text-gray-900">My Folders</h2>
     </div>
-    <div class="p-6">
+    <div class="p-6 overflow-visible">
       <% if @folders.any? %>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-visible">
           <% @folders.each do |folder| %>
             <%= render 'folder', folder: folder %>
           <% end %>
@@ -41,12 +41,12 @@
 
   <!-- Shared Folders -->
   <% if @shared_folders.any? %>
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-visible">
       <div class="px-6 py-4 border-b border-gray-200">
         <h2 class="text-lg font-medium text-gray-900">Shared with Me</h2>
       </div>
-      <div class="p-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div class="p-6 overflow-visible">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-visible">
           <% @shared_folders.each do |folder| %>
             <div class="group relative bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <div class="flex items-center">

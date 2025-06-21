@@ -229,6 +229,9 @@
           });
         }
         
+        // Initialize dropdown functionality
+        initializeDropdowns();
+        
         // Global click handler to close dropdowns
         document.addEventListener('click', function(e) {
           // Close user dropdown
@@ -241,6 +244,140 @@
             newDropdown.classList.add('hidden');
             console.log('Closing new dropdown from outside click');
           }
+          
+          // Close folder dropdowns
+          document.querySelectorAll('.folder-menu-dropdown').forEach(dropdown => {
+            const button = document.querySelector(`.folder-menu-button[data-folder-id="${dropdown.getAttribute('data-folder-id')}"]`);
+            if (button && !button.contains(e.target) && !dropdown.contains(e.target)) {
+              dropdown.classList.add('hidden');
+            }
+          });
+          
+          // Close document dropdowns
+          document.querySelectorAll('.document-menu-dropdown').forEach(dropdown => {
+            const button = document.querySelector(`.document-menu-button[data-document-id="${dropdown.getAttribute('data-document-id')}"]`);
+            if (button && !button.contains(e.target) && !dropdown.contains(e.target)) {
+              dropdown.classList.add('hidden');
+            }
+          });
+        });
+        
+        function initializeDropdowns() {
+          console.log('Initializing dropdowns...');
+          
+          // Folder menu dropdowns
+          const folderMenuButtons = document.querySelectorAll('.folder-menu-button');
+          console.log('Found folder menu buttons:', folderMenuButtons.length);
+          
+          folderMenuButtons.forEach(button => {
+            // Remove existing event listeners by cloning
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+            
+            newButton.addEventListener('click', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Folder menu button clicked');
+              
+              const folderId = this.getAttribute('data-folder-id');
+              const dropdown = document.querySelector(`.folder-menu-dropdown[data-folder-id="${folderId}"]`);
+              
+              // Close all other dropdowns
+              document.querySelectorAll('.folder-menu-dropdown').forEach(d => {
+                if (d !== dropdown) d.classList.add('hidden');
+              });
+              
+              // Toggle current dropdown
+              if (dropdown) {
+                const isVisible = !dropdown.classList.contains('hidden');
+                if (isVisible) {
+                  dropdown.classList.add('hidden');
+                  console.log('Hiding folder dropdown');
+                } else {
+                  // Move dropdown to body to ensure it's above all elements
+                  if (dropdown.parentNode !== document.body) {
+                    document.body.appendChild(dropdown);
+                  }
+                  
+                  // Position the dropdown relative to the button
+                  const buttonRect = this.getBoundingClientRect();
+                  const dropdownRect = dropdown.getBoundingClientRect();
+                  
+                  // Position dropdown below and to the right of the button
+                  dropdown.style.top = (buttonRect.bottom + 8) + 'px';
+                  dropdown.style.left = (buttonRect.right - dropdownRect.width) + 'px';
+                  dropdown.style.position = 'fixed';
+                  dropdown.style.zIndex = '9999';
+                  
+                  dropdown.classList.remove('hidden');
+                  console.log('Showing folder dropdown at position:', dropdown.style.top, dropdown.style.left);
+                }
+              }
+            });
+          });
+          
+          // Document menu dropdowns
+          const documentMenuButtons = document.querySelectorAll('.document-menu-button');
+          console.log('Found document menu buttons:', documentMenuButtons.length);
+          
+          documentMenuButtons.forEach(button => {
+            // Remove existing event listeners by cloning
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+            
+            newButton.addEventListener('click', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Document menu button clicked');
+              
+              const documentId = this.getAttribute('data-document-id');
+              const dropdown = document.querySelector(`.document-menu-dropdown[data-document-id="${documentId}"]`);
+              
+              // Close all other dropdowns
+              document.querySelectorAll('.document-menu-dropdown').forEach(d => {
+                if (d !== dropdown) d.classList.add('hidden');
+              });
+              
+              // Toggle current dropdown
+              if (dropdown) {
+                const isVisible = !dropdown.classList.contains('hidden');
+                if (isVisible) {
+                  dropdown.classList.add('hidden');
+                  console.log('Hiding document dropdown');
+                } else {
+                  // Move dropdown to body to ensure it's above all elements
+                  if (dropdown.parentNode !== document.body) {
+                    document.body.appendChild(dropdown);
+                  }
+                  
+                  // Position the dropdown relative to the button
+                  const buttonRect = this.getBoundingClientRect();
+                  const dropdownRect = dropdown.getBoundingClientRect();
+                  
+                  // Position dropdown below and to the right of the button
+                  dropdown.style.top = (buttonRect.bottom + 8) + 'px';
+                  dropdown.style.left = (buttonRect.right - dropdownRect.width) + 'px';
+                  dropdown.style.position = 'fixed';
+                  dropdown.style.zIndex = '9999';
+                  
+                  dropdown.classList.remove('hidden');
+                  console.log('Showing document dropdown at position:', dropdown.style.top, dropdown.style.left);
+                }
+              }
+            });
+          });
+        }
+        
+        // Re-initialize dropdowns when Turbo navigates (for dynamic content)
+        document.addEventListener('turbo:load', function() {
+          console.log('Turbo load event, re-initializing dropdowns...');
+          initializeDropdowns();
+        });
+        
+        // Also re-initialize on turbo:render for dynamic updates
+        document.addEventListener('turbo:render', function() {
+          console.log('Turbo render event, re-initializing dropdowns...');
+          setTimeout(initializeDropdowns, 100); // Small delay to ensure DOM is ready
         });
       });
     </script>

@@ -1,0 +1,83 @@
+<% content_for :title, "Edit Folder - PaperVault" %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Edit Folder</h1>
+    <p class="text-gray-600">Rename or change the color of your folder</p>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <%= form_with model: @folder, local: true, class: "space-y-6" do |f| %>
+      <%# Error messages here if any %>
+
+      <div>
+        <label for="folder_name" class="block text-sm font-medium text-gray-700 mb-2">
+          Folder Name
+        </label>
+        <%= f.text_field :name, 
+            class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm",
+            required: true %>
+      </div>
+
+      <div>
+        <label for="folder_color" class="block text-sm font-medium text-gray-700 mb-2">
+          Folder Color
+        </label>
+        <div class="flex flex-wrap gap-4">
+          <% colors = ['#4285f4', '#34a853', '#fbbc04', '#ea4335', '#9c27b0', '#ff9800', '#795548', '#607d8b', '#e91e63', '#00bcd4', '#4caf50', '#ff5722'] %>
+          <% colors.each do |color| %>
+            <label class="relative cursor-pointer">
+              <%= f.radio_button :color, color, class: "sr-only", checked: @folder.color == color %>
+              <div class="color-option w-12 h-12 rounded-full border-2 transition-all duration-200"
+                   data-color="<%= color %>"
+                   style="background-color: <%= color %>;">
+              </div>
+            </label>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+        <%= link_to "Cancel", @folder, class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+        <%= f.submit "Save Changes", class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const colorOptions = document.querySelectorAll('.color-option');
+  const radioButtons = document.querySelectorAll('input[name="folder[color]"]');
+  
+  function selectColor(color) {
+    radioButtons.forEach(radio => {
+      radio.checked = (radio.value === color);
+    });
+    
+    colorOptions.forEach(option => {
+      const optionColor = option.getAttribute('data-color');
+      if (optionColor === color) {
+        option.style.borderColor = '#3b82f6';
+        option.style.borderWidth = '4px';
+        option.style.transform = 'scale(1.1)';
+      } else {
+        option.style.borderColor = 'transparent';
+        option.style.borderWidth = '4px';
+        option.style.transform = 'scale(1)';
+      }
+    });
+  }
+  
+  colorOptions.forEach(option => {
+    option.addEventListener('click', function() {
+      const color = this.getAttribute('data-color');
+      selectColor(color);
+    });
+  });
+  
+  // Initialize with current folder color
+  const initialColor = document.querySelector('input[name="folder[color]"]:checked').value;
+  selectColor(initialColor);
+});
+</script> 
