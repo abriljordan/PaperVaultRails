@@ -66,7 +66,8 @@
 
               <!-- User Dropdown -->
               <div class="relative">
-                <button type="button" class="flex items-center space-x-2 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button">
+                <button type="button" class="flex items-center space-x-2 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" 
+                        id="user-menu-button" data-dropdown-toggle="user-menu-dropdown">
                   <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=<%= current_user.name %>&background=4285f4&color=fff" alt="">
                   <span class="hidden md:block text-gray-700"><%= current_user.name %></span>
                   <i class="fas fa-chevron-down text-gray-400"></i>
@@ -101,7 +102,8 @@
             <!-- Quick Actions -->
             <div class="mb-6">
               <div class="relative">
-                <button type="button" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center" id="new-button">
+                <button type="button" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center" 
+                        id="new-button" data-dropdown-toggle="new-dropdown">
                   <i class="fas fa-plus mr-2"></i>New
                   <i class="fas fa-chevron-down ml-2"></i>
                 </button>
@@ -186,199 +188,120 @@
     <% end %>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM loaded, initializing dropdowns...');
-        
-        // User dropdown functionality
-        const userMenuButton = document.getElementById('user-menu-button');
-        const userMenuDropdown = document.getElementById('user-menu-dropdown');
-        
-        if (userMenuButton && userMenuDropdown) {
-          userMenuButton.addEventListener('click', function(e) {
-            e.stopPropagation();
-            userMenuDropdown.classList.toggle('hidden');
-          });
-        }
+      // --- Dropdown Handler ---
+      // This is the core logic for all our dropdowns (folders, documents, etc.)
+      // It's designed to be robust and handle dynamic content from Turbo.
+      
+      let openDropdown = null;
 
-        // New button dropdown functionality
-        const newButton = document.getElementById('new-button');
-        const newDropdown = document.getElementById('new-dropdown');
-        
-        if (newButton && newDropdown) {
-          console.log('Setting up new button dropdown');
-          
-          // Toggle dropdown on button click
-          newButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('New button clicked');
-            
-            const isVisible = !newDropdown.classList.contains('hidden');
-            if (isVisible) {
-              newDropdown.classList.add('hidden');
-              console.log('Hiding dropdown');
-            } else {
-              newDropdown.classList.remove('hidden');
-              console.log('Showing dropdown');
-            }
-          });
-          
-          // Keep dropdown open when clicking inside it
-          newDropdown.addEventListener('click', function(e) {
-            e.stopPropagation();
-          });
+      function closeOpenDropdown() {
+        if (openDropdown) {
+          openDropdown.classList.add('hidden');
+          openDropdown = null;
         }
+      }
+
+      function attachDropdownListener(button) {
+        // Prevent adding the same listener multiple times
+        if (button.dataset.dropdownAttached) return;
+        button.dataset.dropdownAttached = 'true';
         
-        // Initialize dropdown functionality
-        initializeDropdowns();
-        
-        // Global click handler to close dropdowns
-        document.addEventListener('click', function(e) {
-          // Close user dropdown
-          if (userMenuDropdown && !userMenuButton.contains(e.target)) {
-            userMenuDropdown.classList.add('hidden');
-          }
+        button.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const dropdownId = button.getAttribute('data-dropdown-id');
+          const dropdown = document.getElementById(dropdownId);
+
+          if (!dropdown) return;
           
-          // Close new dropdown
-          if (newDropdown && !newButton.contains(e.target) && !newDropdown.contains(e.target)) {
-            newDropdown.classList.add('hidden');
-            console.log('Closing new dropdown from outside click');
-          }
-          
-          // Close folder dropdowns
-          document.querySelectorAll('.folder-menu-dropdown').forEach(dropdown => {
-            const button = document.querySelector(`.folder-menu-button[data-folder-id="${dropdown.getAttribute('data-folder-id')}"]`);
-            if (button && !button.contains(e.target) && !dropdown.contains(e.target)) {
-              dropdown.classList.add('hidden');
+          if (openDropdown === dropdown) {
+            closeOpenDropdown();
+          } else {
+            closeOpenDropdown(); // Close any previously open one
+            
+            // Move to body to avoid z-index/clipping issues from parent containers
+            if (dropdown.parentNode !== document.body) {
+                document.body.appendChild(dropdown);
             }
-          });
-          
-          // Close document dropdowns
-          document.querySelectorAll('.document-menu-dropdown').forEach(dropdown => {
-            const button = document.querySelector(`.document-menu-button[data-document-id="${dropdown.getAttribute('data-document-id')}"]`);
-            if (button && !button.contains(e.target) && !dropdown.contains(e.target)) {
-              dropdown.classList.add('hidden');
+
+            const buttonRect = button.getBoundingClientRect();
+            const PADDING = 8;
+            
+            // Make dropdown visible but offscreen to measure it
+            dropdown.style.visibility = 'hidden';
+            dropdown.classList.remove('hidden');
+            const dropdownWidth = dropdown.offsetWidth;
+            const dropdownHeight = dropdown.offsetHeight;
+            dropdown.classList.add('hidden');
+            dropdown.style.visibility = 'visible';
+
+            let top = buttonRect.bottom + PADDING / 2;
+            let left = buttonRect.right - dropdownWidth;
+
+            // Boundary checks
+            if (left < PADDING) left = PADDING;
+            if (left + dropdownWidth > window.innerWidth - PADDING) {
+              left = window.innerWidth - dropdownWidth - PADDING;
             }
-          });
+            if (top + dropdownHeight > window.innerHeight - PADDING) {
+              top = buttonRect.top - dropdownHeight - (PADDING / 2);
+            }
+            if (top < PADDING) top = PADDING;
+
+            dropdown.style.top = `${top}px`;
+            dropdown.style.left = `${left}px`;
+            dropdown.style.position = 'fixed';
+            dropdown.style.zIndex = '9999';
+
+            dropdown.classList.remove('hidden');
+            openDropdown = dropdown;
+          }
         });
-        
-        function initializeDropdowns() {
-          console.log('Initializing dropdowns...');
-          
-          // Folder menu dropdowns
-          const folderMenuButtons = document.querySelectorAll('.folder-menu-button');
-          console.log('Found folder menu buttons:', folderMenuButtons.length);
-          
-          folderMenuButtons.forEach(button => {
-            // Remove existing event listeners by cloning
-            const newButton = button.cloneNode(true);
-            button.parentNode.replaceChild(newButton, button);
+      }
+
+      function initializeAllDropdowns() {
+        console.log("Initializing dropdowns...");
+        // For folders and documents that have specific data attributes
+        document.querySelectorAll('.folder-menu-button, .document-menu-button').forEach(button => {
+            const type = button.classList.contains('folder-menu-button') ? 'folder' : 'document';
+            const id = button.getAttribute(`data-${type}-id`);
+            const dropdownId = `${type}-menu-dropdown-${id}`;
             
-            newButton.addEventListener('click', function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              console.log('Folder menu button clicked');
-              
-              const folderId = this.getAttribute('data-folder-id');
-              const dropdown = document.querySelector(`.folder-menu-dropdown[data-folder-id="${folderId}"]`);
-              
-              // Close all other dropdowns
-              document.querySelectorAll('.folder-menu-dropdown').forEach(d => {
-                if (d !== dropdown) d.classList.add('hidden');
-              });
-              
-              // Toggle current dropdown
-              if (dropdown) {
-                const isVisible = !dropdown.classList.contains('hidden');
-                if (isVisible) {
-                  dropdown.classList.add('hidden');
-                  console.log('Hiding folder dropdown');
-                } else {
-                  // Move dropdown to body to ensure it's above all elements
-                  if (dropdown.parentNode !== document.body) {
-                    document.body.appendChild(dropdown);
-                  }
-                  
-                  // Position the dropdown relative to the button
-                  const buttonRect = this.getBoundingClientRect();
-                  const dropdownRect = dropdown.getBoundingClientRect();
-                  
-                  // Position dropdown below and to the right of the button
-                  dropdown.style.top = (buttonRect.bottom + 8) + 'px';
-                  dropdown.style.left = (buttonRect.right - dropdownRect.width) + 'px';
-                  dropdown.style.position = 'fixed';
-                  dropdown.style.zIndex = '9999';
-                  
-                  dropdown.classList.remove('hidden');
-                  console.log('Showing folder dropdown at position:', dropdown.style.top, dropdown.style.left);
-                }
-              }
-            });
-          });
-          
-          // Document menu dropdowns
-          const documentMenuButtons = document.querySelectorAll('.document-menu-button');
-          console.log('Found document menu buttons:', documentMenuButtons.length);
-          
-          documentMenuButtons.forEach(button => {
-            // Remove existing event listeners by cloning
-            const newButton = button.cloneNode(true);
-            button.parentNode.replaceChild(newButton, button);
-            
-            newButton.addEventListener('click', function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              console.log('Document menu button clicked');
-              
-              const documentId = this.getAttribute('data-document-id');
-              const dropdown = document.querySelector(`.document-menu-dropdown[data-document-id="${documentId}"]`);
-              
-              // Close all other dropdowns
-              document.querySelectorAll('.document-menu-dropdown').forEach(d => {
-                if (d !== dropdown) d.classList.add('hidden');
-              });
-              
-              // Toggle current dropdown
-              if (dropdown) {
-                const isVisible = !dropdown.classList.contains('hidden');
-                if (isVisible) {
-                  dropdown.classList.add('hidden');
-                  console.log('Hiding document dropdown');
-                } else {
-                  // Move dropdown to body to ensure it's above all elements
-                  if (dropdown.parentNode !== document.body) {
-                    document.body.appendChild(dropdown);
-                  }
-                  
-                  // Position the dropdown relative to the button
-                  const buttonRect = this.getBoundingClientRect();
-                  const dropdownRect = dropdown.getBoundingClientRect();
-                  
-                  // Position dropdown below and to the right of the button
-                  dropdown.style.top = (buttonRect.bottom + 8) + 'px';
-                  dropdown.style.left = (buttonRect.right - dropdownRect.width) + 'px';
-                  dropdown.style.position = 'fixed';
-                  dropdown.style.zIndex = '9999';
-                  
-                  dropdown.classList.remove('hidden');
-                  console.log('Showing document dropdown at position:', dropdown.style.top, dropdown.style.left);
-                }
-              }
-            });
-          });
+            // Link the button to its dropdown via a shared, unique ID
+            button.setAttribute('data-dropdown-id', dropdownId);
+            const dropdown = document.querySelector(`.${type}-menu-dropdown[data-${type}-id="${id}"]`);
+            if (dropdown) {
+                dropdown.id = dropdownId;
+                attachDropdownListener(button);
+            }
+        });
+
+        // For general dropdowns like User and New
+        document.querySelectorAll('[data-dropdown-toggle]').forEach(button => {
+            const dropdownId = button.getAttribute('data-dropdown-toggle');
+            button.setAttribute('data-dropdown-id', dropdownId);
+            attachDropdownListener(button);
+        });
+      }
+
+      // --- Global Event Listeners ---
+      
+      // Close dropdowns if clicking outside
+      document.addEventListener('click', (e) => {
+        if (openDropdown && !openDropdown.contains(e.target)) {
+          closeOpenDropdown();
         }
-        
-        // Re-initialize dropdowns when Turbo navigates (for dynamic content)
-        document.addEventListener('turbo:load', function() {
-          console.log('Turbo load event, re-initializing dropdowns...');
-          initializeDropdowns();
-        });
-        
-        // Also re-initialize on turbo:render for dynamic updates
-        document.addEventListener('turbo:render', function() {
-          console.log('Turbo render event, re-initializing dropdowns...');
-          setTimeout(initializeDropdowns, 100); // Small delay to ensure DOM is ready
-        });
+      });
+      
+      // Initialize on first page load
+      document.addEventListener('DOMContentLoaded', initializeAllDropdowns);
+      
+      // Re-initialize whenever Turbo loads a new page or updates content
+      document.addEventListener("turbo:load", initializeAllDropdowns);
+      document.addEventListener("turbo:render", () => {
+        // A small delay after render can help ensure all elements are in the DOM
+        setTimeout(initializeAllDropdowns, 50);
       });
     </script>
   </body>

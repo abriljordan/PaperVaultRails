@@ -73,55 +73,18 @@
     <div class="px-6 py-4 border-b border-gray-200">
       <h2 class="text-lg font-medium text-gray-900">Recent Files</h2>
     </div>
-    <div class="divide-y divide-gray-200">
+    <div class="divide-y divide-gray-200 px-6">
       <% if @recent_documents.any? %>
         <% @recent_documents.each do |document| %>
-          <div class="px-6 py-4 hover:bg-gray-50">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <% if document.is_image? %>
-                    <i class="fas fa-image text-green-600 text-xl"></i>
-                  <% elsif document.is_pdf? %>
-                    <i class="fas fa-file-pdf text-red-600 text-xl"></i>
-                  <% elsif document.is_document? %>
-                    <i class="fas fa-file-word text-blue-600 text-xl"></i>
-                  <% elsif document.is_spreadsheet? %>
-                    <i class="fas fa-file-excel text-green-600 text-xl"></i>
-                  <% elsif document.is_presentation? %>
-                    <i class="fas fa-file-powerpoint text-orange-600 text-xl"></i>
-                  <% else %>
-                    <i class="fas fa-file text-gray-600 text-xl"></i>
-                  <% end %>
-                </div>
-                <div class="ml-4">
-                  <p class="text-sm font-medium text-gray-900"><%= document.name %></p>
-                  <p class="text-sm text-gray-500"><%= number_to_human_size(document.file_size) %> • <%= time_ago_in_words(document.updated_at) %> ago</p>
-                </div>
-              </div>
-              <div class="flex items-center space-x-2">
-                <% if document.is_starred? %>
-                  <%= link_to unstar_document_path(document), method: :patch, class: "text-yellow-500 hover:text-yellow-600", data: { turbo_method: :patch } do %>
-                    <i class="fas fa-star"></i>
-                  <% end %>
-                <% else %>
-                  <%= link_to star_document_path(document), method: :patch, class: "text-gray-400 hover:text-yellow-500", data: { turbo_method: :patch } do %>
-                    <i class="far fa-star"></i>
-                  <% end %>
-                <% end %>
-                <div class="relative">
-                  <button class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-ellipsis-v"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
+          <div class="group">
+            <%= render 'documents/document', document: document %>
           </div>
         <% end %>
       <% else %>
-        <div class="px-6 py-8 text-center">
-          <i class="fas fa-file text-gray-400 text-4xl mb-4"></i>
-          <p class="text-gray-500">No files yet. Upload your first file to get started!</p>
+        <div class="text-center py-12">
+          <i class="fas fa-file-alt text-gray-400 text-5xl mb-4"></i>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">No recent files</h3>
+          <p class="text-gray-500">Files you recently worked on will appear here.</p>
         </div>
       <% end %>
     </div>

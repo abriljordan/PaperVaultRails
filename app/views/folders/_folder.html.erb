@@ -34,7 +34,9 @@
           <i class="fas fa-ellipsis-v text-sm"></i>
         </button>
         
-        <div class="hidden fixed w-48 bg-white rounded-md shadow-lg border border-gray-200 z-[9999] folder-menu-dropdown" data-folder-id="<%= folder.id %>">
+        <div class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50 folder-menu-dropdown" 
+             id="folder-menu-dropdown-<%= folder.id %>"
+             data-folder-id="<%= folder.id %>">
           <div class="py-1">
             <%= link_to edit_folder_path(folder), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" do %>
               <i class="fas fa-edit mr-3 text-gray-400"></i>
