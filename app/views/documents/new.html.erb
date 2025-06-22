@@ -36,7 +36,8 @@
         </label>
         <%= f.text_field :name, 
             class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500",
-            placeholder: "Leave blank to use original filename" %>
+            placeholder: "Leave blank to use original filename",
+            data: { "file-upload-target": "nameField" } %>
         <p class="mt-1 text-sm text-gray-500">If left blank, the original filename will be used</p>
       </div>
 
@@ -53,11 +54,12 @@
         </div>
       <% end %>
 
-      <div>
+      <div data-controller="file-upload">
         <label for="document_file" class="block text-sm font-medium text-gray-700 mb-2">
           Select File
         </label>
-        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors" id="drop-zone">
+        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors" 
+             data-file-upload-target="zone">
           <div class="space-y-1 text-center">
             <i class="fas fa-cloud-upload-alt text-gray-400 text-4xl mb-4"></i>
             <div class="flex text-sm text-gray-600">
@@ -66,7 +68,8 @@
                 <%= f.file_field :file, 
                     class: "sr-only",
                     accept: "image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip",
-                    required: true %>
+                    required: true,
+                    data: { "file-upload-target": "input" } %>
               </label>
               <p class="pl-1">or drag and drop</p>
             </div>
@@ -75,12 +78,12 @@
             </p>
           </div>
         </div>
-        <div id="file-info" class="mt-2 hidden">
+        <div data-file-upload-target="info" class="mt-2 hidden">
           <div class="flex items-center p-3 bg-blue-50 rounded-md">
             <i class="fas fa-file text-blue-500 mr-3"></i>
             <div>
-              <p class="text-sm font-medium text-blue-900" id="file-name"></p>
-              <p class="text-xs text-blue-700" id="file-size"></p>
+              <p class="text-sm font-medium text-blue-900" data-file-upload-target="name"></p>
+              <p class="text-xs text-blue-700" data-file-upload-target="size"></p>
             </div>
           </div>
         </div>
@@ -94,84 +97,4 @@
       </div>
     <% end %>
   </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const fileInput = document.getElementById('document_file');
-  const dropZone = document.getElementById('drop-zone');
-  const fileInfo = document.getElementById('file-info');
-  const fileName = document.getElementById('file-name');
-  const fileSize = document.getElementById('file-size');
-
-  // Prevent default drag behaviors
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, preventDefaults, false);
-    document.body.addEventListener(eventName, preventDefaults, false);
-  });
-
-  // Highlight drop zone when item is dragged over it
-  ['dragenter', 'dragover'].forEach(eventName => {
-    dropZone.addEventListener(eventName, highlight, false);
-  });
-
-  ['dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, unhighlight, false);
-  });
-
-  // Handle dropped files
-  dropZone.addEventListener('drop', handleDrop, false);
-
-  // Handle file selection via input
-  fileInput.addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-      showFileInfo(file);
-    }
-  });
-
-  function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  function highlight(e) {
-    dropZone.classList.add('border-blue-400', 'bg-blue-50');
-  }
-
-  function unhighlight(e) {
-    dropZone.classList.remove('border-blue-400', 'bg-blue-50');
-  }
-
-  function handleDrop(e) {
-    const dt = e.dataTransfer;
-    const files = dt.files;
-    
-    if (files.length > 0) {
-      fileInput.files = files;
-      showFileInfo(files[0]);
-    }
-  }
-
-  function showFileInfo(file) {
-    console.log('Showing file info for:', file.name); // Debug log
-    fileName.textContent = file.name;
-    fileSize.textContent = formatFileSize(file.size);
-    fileInfo.classList.remove('hidden');
-    
-    // Also update the file name field if it's empty
-    const nameField = document.getElementById('document_name');
-    if (nameField && nameField.value === '') {
-      nameField.value = file.name;
-    }
-  }
-
-  function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
-});
-</script> 
+</div> 

@@ -28,6 +28,7 @@ Rails.application.routes.draw do
       patch :star
       patch :unstar
       get :share
+      get :dropdown
     end
     resources :folder_shares, only: [:create, :destroy]
   end
@@ -39,6 +40,7 @@ Rails.application.routes.draw do
       patch :star
       patch :unstar
       get :share
+      get :dropdown
     end
     collection do
       get :bulk_upload

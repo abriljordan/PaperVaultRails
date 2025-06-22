@@ -53,7 +53,7 @@
         </div>
       <% end %>
 
-      <div>
+      <div data-controller="color-picker">
         <label for="folder_color" class="block text-sm font-medium text-gray-700 mb-2">
           Folder Color
         </label>
@@ -61,7 +61,9 @@
         <!-- Color Preview -->
         <div class="mb-4 p-3 bg-gray-50 rounded-lg">
           <div class="flex items-center">
-            <div id="color-preview" class="w-8 h-8 rounded-lg mr-3" style="background-color: #4285f4;"></div>
+            <div id="color-preview" class="w-8 h-8 rounded-lg mr-3" 
+                 data-color-picker-target="preview" 
+                 style="background-color: #4285f4;"></div>
             <span class="text-sm text-gray-600">Selected color preview</span>
           </div>
         </div>
@@ -70,9 +72,14 @@
           <% colors = ['#4285f4', '#34a853', '#fbbc04', '#ea4335', '#9c27b0', '#ff9800', '#795548', '#607d8b', '#e91e63', '#00bcd4', '#4caf50', '#ff5722'] %>
           <% colors.each do |color| %>
             <label class="relative cursor-pointer">
-              <%= f.radio_button :color, color, class: "sr-only", checked: color == '#4285f4' %>
+              <%= f.radio_button :color, color, 
+                  class: "sr-only", 
+                  checked: color == '#4285f4',
+                  data: { "color-picker-target": "radio" } %>
               <div class="color-option w-14 h-14 rounded-full border-3 border-gray-300 hover:border-gray-400 transition-all duration-200 transform hover:scale-110 shadow-md"
                    data-color="<%= color %>"
+                   data-color-picker-target="option"
+                   data-action="click->color-picker#select"
                    style="background-color: <%= color %>; border: 3px solid #d1d5db; min-width: 56px; min-height: 56px;">
               </div>
             </label>
@@ -89,52 +96,4 @@
       </div>
     <% end %>
   </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const colorOptions = document.querySelectorAll('.color-option');
-  const radioButtons = document.querySelectorAll('input[name="folder[color]"]');
-  const colorPreview = document.getElementById('color-preview');
-  
-  // Function to select a color
-  function selectColor(color) {
-    // Update radio buttons
-    radioButtons.forEach(radio => {
-      radio.checked = (radio.value === color);
-    });
-    
-    // Update color preview
-    if (colorPreview) {
-      colorPreview.style.backgroundColor = color;
-    }
-    
-    // Update visual styling
-    colorOptions.forEach(option => {
-      const optionColor = option.getAttribute('data-color');
-      if (optionColor === color) {
-        option.style.borderColor = '#3b82f6';
-        option.style.borderWidth = '4px';
-        option.style.transform = 'scale(1.15)';
-        option.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
-      } else {
-        option.style.borderColor = '#d1d5db';
-        option.style.borderWidth = '3px';
-        option.style.transform = 'scale(1)';
-        option.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
-      }
-    });
-  }
-  
-  // Add click event listeners to color options
-  colorOptions.forEach(option => {
-    option.addEventListener('click', function() {
-      const color = this.getAttribute('data-color');
-      selectColor(color);
-    });
-  });
-  
-  // Initialize with default color
-  selectColor('#4285f4');
-});
-</script> 
+</div> 

@@ -14,21 +14,92 @@
     </div>
   </div>
 
-  <!-- Folders Grid -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-visible">
+  <!-- Folders Table -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200">
     <div class="px-6 py-4 border-b border-gray-200">
       <h2 class="text-lg font-medium text-gray-900">My Folders</h2>
     </div>
-    <div class="p-6 overflow-visible">
+    <div class="overflow-x-auto">
       <% if @folders.any? %>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-visible">
-          <% @folders.each do |folder| %>
-            <%= render 'folder', folder: folder %>
-          <% end %>
-        </div>
+        <table class="w-full table-fixed divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 40%; text-align: left;">Folder</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 15%; text-align: left;">Items</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 15%; text-align: left;">Size</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 15%; text-align: left;">Modified</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 15%; text-align: left;">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @folders.each do |folder| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4" style="width: 40%">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                      <i class="fas fa-folder text-2xl" style="color: <%= folder.color %>"></i>
+                    </div>
+                    <div class="ml-4 min-w-0 flex-1">
+                      <%= link_to folder_path(folder), class: "text-sm font-medium text-gray-900 hover:text-blue-600 truncate block" do %>
+                        <%= folder.name %>
+                      <% end %>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500" style="width: 15%">
+                  <%= folder.document_count %> items
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500" style="width: 15%">
+                  <%= number_to_human_size(folder.total_size) %>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500" style="width: 15%">
+                  <%= time_ago_in_words(folder.updated_at) %> ago
+                </td>
+                <td class="px-6 py-4 text-sm font-medium" style="width: 15%">
+                  <div class="flex items-center space-x-1">
+                    <% if folder.is_starred? %>
+                      <%= link_to unstar_folder_path(folder), 
+                          class: "text-yellow-500 hover:text-yellow-600 p-1",
+                          data: { "turbo-method": :patch }, title: "Unstar" do %>
+                        <i class="fas fa-star text-sm"></i>
+                      <% end %>
+                    <% else %>
+                      <%= link_to star_folder_path(folder), 
+                          class: "text-gray-400 hover:text-yellow-500 p-1",
+                          data: { "turbo-method": :patch }, title: "Star" do %>
+                        <i class="far fa-star text-sm"></i>
+                      <% end %>
+                    <% end %>
+                    
+                    <%= link_to folder_path(folder), 
+                        class: "text-gray-400 hover:text-blue-600 p-1", title: "View" do %>
+                      <i class="fas fa-eye text-sm"></i>
+                    <% end %>
+                    
+                    <%= link_to edit_folder_path(folder), 
+                        class: "text-gray-400 hover:text-blue-600 p-1", title: "Edit" do %>
+                      <i class="fas fa-edit text-sm"></i>
+                    <% end %>
+                    
+                    <%= link_to share_folder_path(folder), 
+                        class: "text-gray-400 hover:text-green-600 p-1", title: "Share" do %>
+                      <i class="fas fa-share text-sm"></i>
+                    <% end %>
+                    
+                    <%= link_to folder_path(folder), 
+                        class: "text-gray-400 hover:text-red-600 p-1", title: "Delete",
+                        data: { "turbo-method": :delete, "turbo-confirm": "Are you sure you want to delete '#{folder.name}'?" } do %>
+                      <i class="fas fa-trash text-sm"></i>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
       <% else %>
         <div class="text-center py-12">
-          <i class="fas fa-folder text-gray-400 text-6xl mb-4"></i>
+          <i class="fas fa-folder text-gray-400 text-5xl mb-4"></i>
           <h3 class="text-lg font-medium text-gray-900 mb-2">No folders yet</h3>
           <p class="text-gray-500 mb-6">Create your first folder to start organizing your files</p>
           <%= link_to new_folder_path, class: "bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors" do %>
@@ -41,27 +112,62 @@
 
   <!-- Shared Folders -->
   <% if @shared_folders.any? %>
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-visible">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
       <div class="px-6 py-4 border-b border-gray-200">
         <h2 class="text-lg font-medium text-gray-900">Shared with Me</h2>
       </div>
-      <div class="p-6 overflow-visible">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-visible">
-          <% @shared_folders.each do |folder| %>
-            <div class="group relative bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-              <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <i class="fas fa-folder text-yellow-500 text-3xl"></i>
-                </div>
-                <div class="ml-3 min-w-0 flex-1">
-                  <p class="text-sm font-medium text-gray-900 truncate"><%= folder.name %></p>
-                  <p class="text-xs text-gray-500">Shared by <%= folder.user.name %></p>
-                  <p class="text-xs text-gray-500"><%= folder.document_count %> items</p>
-                </div>
-              </div>
-            </div>
-          <% end %>
-        </div>
+      <div class="overflow-x-auto">
+        <table class="w-full table-fixed divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 40%; text-align: left;">Folder</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 15%; text-align: left;">Items</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 15%; text-align: left;">Size</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 15%; text-align: left;">Shared by</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 15%; text-align: left;">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @shared_folders.each do |folder| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4" style="width: 40%">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                      <i class="fas fa-folder text-2xl text-yellow-500"></i>
+                    </div>
+                    <div class="ml-4 min-w-0 flex-1">
+                      <%= link_to folder_path(folder), class: "text-sm font-medium text-gray-900 hover:text-blue-600 truncate block" do %>
+                        <%= folder.name %>
+                      <% end %>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500" style="width: 15%">
+                  <%= folder.document_count %> items
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500" style="width: 15%">
+                  <%= number_to_human_size(folder.total_size) %>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500" style="width: 15%">
+                  <%= folder.user.name %>
+                </td>
+                <td class="px-6 py-4 text-sm font-medium" style="width: 15%">
+                  <div class="flex items-center space-x-1">
+                    <%= link_to folder_path(folder), 
+                        class: "text-gray-400 hover:text-blue-600 p-1", title: "View" do %>
+                      <i class="fas fa-eye text-sm"></i>
+                    <% end %>
+                    
+                    <%= link_to download_folder_path(folder), 
+                        class: "text-gray-400 hover:text-blue-600 p-1", title: "Download" do %>
+                      <i class="fas fa-download text-sm"></i>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
     </div>
   <% end %>

@@ -1,6 +1,6 @@
 class FoldersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_folder, only: [:show, :edit, :update, :destroy, :star, :unstar, :share]
+  before_action :set_folder, only: [:show, :edit, :update, :destroy, :star, :unstar, :share, :dropdown]
   before_action :ensure_access, only: [:show, :edit, :update, :destroy]
   before_action :ensure_ownership, only: [:edit, :update, :destroy, :share]
 
@@ -84,6 +84,20 @@ class FoldersController < ApplicationController
 
   def share
     @share = @folder.folder_shares.build
+  end
+
+  def dropdown
+    respond_to do |format|
+      format.html { 
+        render partial: "folders/dropdown", locals: { folder: @folder }
+      }
+      format.turbo_stream { 
+        render turbo_stream: turbo_stream.update(
+          "folder_#{@folder.id}_dropdown",
+          partial: "folders/dropdown", locals: { folder: @folder }
+        )
+      }
+    end
   end
 
   private

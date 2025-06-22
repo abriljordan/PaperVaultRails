@@ -4,5 +4,17 @@
 
 import { application } from "./application"
 
-import HelloController from "./hello_controller"
-application.register("hello", HelloController)
+console.log("Loading controllers...")
+
+import ColorPickerController from "./color_picker_controller"
+application.register("color-picker", ColorPickerController)
+
+import DropdownController from "./dropdown_controller"
+application.register("dropdown", DropdownController)
+
+import FileUploadController from "./file_upload_controller"
+application.register("file-upload", FileUploadController)
+
+console.log("Controllers loaded successfully!")
+
+// No controllers currently registered

@@ -1,6 +1,6 @@
 class DocumentsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_document, only: [:show, :edit, :update, :destroy, :download, :star, :unstar, :share]
+  before_action :set_document, only: [:show, :edit, :update, :destroy, :download, :star, :unstar, :share, :dropdown]
   before_action :ensure_access, only: [:show, :download]
   before_action :ensure_ownership, only: [:edit, :update, :destroy, :share]
 
@@ -83,6 +83,20 @@ class DocumentsController < ApplicationController
 
   def share
     @share = @document.document_shares.build
+  end
+
+  def dropdown
+    respond_to do |format|
+      format.html { 
+        render partial: "documents/dropdown", locals: { document: @document }
+      }
+      format.turbo_stream { 
+        render turbo_stream: turbo_stream.update(
+          "document_#{@document.id}_dropdown",
+          partial: "documents/dropdown", locals: { document: @document }
+        )
+      }
+    end
   end
 
   def bulk_upload
