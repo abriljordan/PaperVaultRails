@@ -66,8 +66,13 @@ class DocumentsController < ApplicationController
   end
 
   def destroy
+    folder = @document.folder
     @document.destroy
-    redirect_to documents_path, notice: 'Document deleted successfully.'
+    if folder
+      redirect_to folder_path(folder), notice: 'Document deleted successfully.'
+    else
+      redirect_to documents_path, notice: 'Document deleted successfully.'
+    end
   end
 
   def download

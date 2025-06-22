@@ -21,6 +21,9 @@ Rails.application.routes.draw do
   # Dashboard
   get 'dashboard', to: 'dashboard#index'
   get 'search', to: 'dashboard#search'
+  get 'shared', to: 'dashboard#shared', as: :shared
+  get 'starred', to: 'dashboard#starred', as: :starred
+  get 'trash', to: 'dashboard#trash', as: :trash
   
   # Folders
   resources :folders do

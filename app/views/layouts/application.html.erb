@@ -70,28 +70,28 @@
           <div class="p-4">
             <!-- Navigation Menu -->
             <nav class="space-y-1">
-              <a href="<%= dashboard_path %>" class="flex items-center px-3 py-2 text-sm font-medium text-gray-900 rounded-md hover:bg-gray-100">
+              <a href="<%= dashboard_path %>" class="flex items-center px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-100 <%= 'text-gray-900 bg-gray-100' if current_page?(dashboard_path) %>">
                 <i class="fas fa-home mr-3 text-gray-400"></i>
                 My Drive
               </a>
-              <a href="<%= folders_path %>" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-100">
+              <a href="<%= folders_path %>" class="flex items-center px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-100 <%= 'text-gray-900 bg-gray-100' if current_page?(folders_path) %>">
                 <i class="fas fa-folder mr-3 text-gray-400"></i>
                 Folders
               </a>
-              <a href="<%= documents_path %>" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-100">
+              <a href="<%= documents_path %>" class="flex items-center px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-100 <%= 'text-gray-900 bg-gray-100' if current_page?(documents_path) %>">
                 <i class="fas fa-file mr-3 text-gray-400"></i>
                 Files
               </a>
-              <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-100">
-                <i class="fas fa-share-alt mr-3 text-gray-400"></i>
+              <a href="<%= shared_path %>" class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition <%= current_page?(shared_path) ? 'text-blue-700 bg-blue-50' : 'text-gray-600 hover:bg-blue-100' %>">
+                <i class="fas fa-share-alt mr-3 <%= current_page?(shared_path) ? 'text-blue-500' : 'text-gray-400' %>"></i>
                 Shared with me
               </a>
-              <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-100">
-                <i class="fas fa-star mr-3 text-gray-400"></i>
+              <a href="<%= starred_path %>" class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition <%= current_page?(starred_path) ? 'text-yellow-700 bg-yellow-50' : 'text-gray-600 hover:bg-yellow-100' %>">
+                <i class="fas fa-star mr-3 <%= current_page?(starred_path) ? 'text-yellow-500' : 'text-gray-400' %>"></i>
                 Starred
               </a>
-              <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-100">
-                <i class="fas fa-trash mr-3 text-gray-400"></i>
+              <a href="<%= trash_path %>" class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition <%= current_page?(trash_path) ? 'text-red-700 bg-red-50' : 'text-gray-600 hover:bg-red-100' %>">
+                <i class="fas fa-trash mr-3 <%= current_page?(trash_path) ? 'text-red-500' : 'text-gray-400' %>"></i>
                 Trash
               </a>
               <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-100">

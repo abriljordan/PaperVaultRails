@@ -29,6 +29,16 @@ class DashboardController < ApplicationController
     end
   end
 
+  def shared
+  end
+
+  def starred
+    @starred_items = get_starred_items
+  end
+
+  def trash
+  end
+
   private
 
   def get_starred_items
