@@ -1,6 +1,6 @@
 <h1 class="text-2xl font-bold mb-6">User Settings</h1>
 <%= form_with model: @user, url: settings_path, method: :patch, local: true, html: { multipart: true }, class: "space-y-8 max-w-xl" do |f| %>
-  <div class="flex items-center space-x-6">
+  <div class="flex items-center space-x-8">
     <% if @user.avatar.attached? %>
       <img src="<%= url_for(@user.avatar) %>" alt="Avatar" class="h-16 w-16 rounded-full object-cover border" />
     <% else %>
