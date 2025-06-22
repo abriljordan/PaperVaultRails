@@ -99,7 +99,7 @@
                 <i class="fas fa-trash mr-3 <%= current_page?(trash_path) ? 'text-red-500' : 'text-gray-400' %>"></i>
                 Trash
               </a>
-              <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-100">
+              <a href="<%= settings_path %>" class="flex items-center px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-100 <%= current_page?(settings_path) ? 'text-gray-900 bg-gray-100' : 'text-gray-600' %>">
                 <i class="fas fa-cog mr-3 text-gray-400"></i>
                 Settings
               </a>

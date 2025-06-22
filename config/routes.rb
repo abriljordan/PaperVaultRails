@@ -73,4 +73,7 @@ Rails.application.routes.draw do
       get 'search', to: 'search#index'
     end
   end
+
+  get 'settings', to: 'settings#edit'
+  patch 'settings', to: 'settings#update'
 end
