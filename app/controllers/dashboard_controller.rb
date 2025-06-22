@@ -3,7 +3,7 @@ class DashboardController < ApplicationController
 
   def index
     @folders = current_user.folders.root_folders.order(:name)
-    @documents = current_user.documents.where(folder: nil).recent.limit(20)
+    @documents = current_user.documents
     @shared_folders = Folder.shared_with(current_user).limit(10)
     @shared_documents = Document.shared_with(current_user).limit(10)
     @recent_documents = current_user.documents.recent.limit(10)
