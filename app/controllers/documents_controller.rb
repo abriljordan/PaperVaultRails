@@ -5,8 +5,34 @@ class DocumentsController < ApplicationController
   before_action :ensure_ownership, only: [:edit, :update, :destroy, :share]
 
   def index
-    @documents = current_user.documents.order(:name)
+    @documents = current_user.documents.order(updated_at: :desc)
     @shared_documents = Document.shared_with(current_user)
+
+    now = Time.zone.now
+    start_of_today = now.beginning_of_day
+    start_of_week = now.beginning_of_week
+    start_of_month = now.beginning_of_month
+    start_of_last_month = (now - 1.month).beginning_of_month
+    end_of_last_month = (now - 1.month).end_of_month
+
+    @grouped_documents = {
+      today: [],
+      week: [],
+      month: [],
+      last_month: []
+    }
+
+    @documents.each do |doc|
+      if doc.updated_at >= start_of_today
+        @grouped_documents[:today] << doc
+      elsif doc.updated_at >= start_of_week
+        @grouped_documents[:week] << doc
+      elsif doc.updated_at >= start_of_month
+        @grouped_documents[:month] << doc
+      elsif doc.updated_at >= start_of_last_month && doc.updated_at <= end_of_last_month
+        @grouped_documents[:last_month] << doc
+      end
+    end
   end
 
   def show
@@ -55,30 +81,12 @@ class DocumentsController < ApplicationController
 
   def star
     @document.update(is_starred: true, starred_at: Time.current)
-    respond_to do |format|
-      format.html { redirect_back(fallback_location: @document) }
-      format.json { render json: { starred: true, message: "Document starred successfully" } }
-      format.turbo_stream { 
-        render turbo_stream: turbo_stream.replace(
-          "document_#{@document.id}",
-          partial: "documents/document", locals: { document: @document }
-        )
-      }
-    end
+    redirect_back(fallback_location: documents_path, notice: 'Document starred successfully.')
   end
 
   def unstar
     @document.update(is_starred: false, starred_at: nil)
-    respond_to do |format|
-      format.html { redirect_back(fallback_location: @document) }
-      format.json { render json: { starred: false, message: "Document unstarred successfully" } }
-      format.turbo_stream { 
-        render turbo_stream: turbo_stream.replace(
-          "document_#{@document.id}",
-          partial: "documents/document", locals: { document: @document }
-        )
-      }
-    end
+    redirect_back(fallback_location: documents_path, notice: 'Document unstarred successfully.')
   end
 
   def share

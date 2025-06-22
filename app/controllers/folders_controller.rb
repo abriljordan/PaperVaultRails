@@ -56,30 +56,12 @@ class FoldersController < ApplicationController
 
   def star
     @folder.update(is_starred: true, starred_at: Time.current)
-    respond_to do |format|
-      format.html { redirect_back(fallback_location: @folder) }
-      format.json { render json: { starred: true, message: "Folder starred successfully" } }
-      format.turbo_stream { 
-        render turbo_stream: turbo_stream.replace(
-          "folder_#{@folder.id}",
-          partial: "folders/folder", locals: { folder: @folder }
-        )
-      }
-    end
+    redirect_back(fallback_location: folders_path, notice: 'Folder starred successfully.')
   end
 
   def unstar
     @folder.update(is_starred: false, starred_at: nil)
-    respond_to do |format|
-      format.html { redirect_back(fallback_location: @folder) }
-      format.json { render json: { starred: false, message: "Folder unstarred successfully" } }
-      format.turbo_stream { 
-        render turbo_stream: turbo_stream.replace(
-          "folder_#{@folder.id}",
-          partial: "folders/folder", locals: { folder: @folder }
-        )
-      }
-    end
+    redirect_back(fallback_location: folders_path, notice: 'Folder unstarred successfully.')
   end
 
   def share

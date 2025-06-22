@@ -78,16 +78,16 @@
         <table class="w-full table-fixed divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 40%; text-align: left;">File</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 15%; text-align: left;">Size</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 15%; text-align: left;">Modified</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 30%; text-align: left;">Actions</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 55%; text-align: left;">File</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" style="width: 120px; min-width: 120px; max-width: 120px; text-align: left;">Size</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" style="width: 140px; min-width: 140px; max-width: 140px; text-align: left;">Modified</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 20%; text-align: left;">Actions</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <% @recent_documents.each do |document| %>
               <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4" style="width: 40%">
+                <td class="px-6 py-4" style="width: 55%">
                   <div class="flex items-center">
                     <div class="flex-shrink-0">
                       <% if document.is_image? %>
@@ -104,20 +104,20 @@
                         <i class="fas fa-file text-2xl text-gray-600"></i>
                       <% end %>
                     </div>
-                    <div class="ml-4 min-w-0 flex-1">
+                    <div class="ml-4 min-w-0 flex-1 truncate overflow-hidden whitespace-nowrap">
                       <%= link_to document_path(document), class: "text-sm font-medium text-gray-900 hover:text-blue-600 truncate block" do %>
                         <%= document.name %>
                       <% end %>
                     </div>
                   </div>
                 </td>
-                <td class="px-6 py-4 text-sm text-gray-500" style="width: 15%">
+                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap" style="width: 120px; min-width: 120px; max-width: 120px;">
                   <%= number_to_human_size(document.file_size) %>
                 </td>
-                <td class="px-6 py-4 text-sm text-gray-500" style="width: 15%">
-                  <%= time_ago_in_words(document.updated_at) %> ago
+                <td class="px-6 py-4 text-sm text-gray-500" style="width: 140px; min-width: 140px; max-width: 140px;">
+                  <%= document.updated_at.strftime('%-l:%M %p') %>
                 </td>
-                <td class="px-6 py-4 text-sm font-medium" style="width: 30%">
+                <td class="px-6 py-4 text-sm font-medium" style="width: 20%">
                   <div class="flex items-center space-x-1">
                     <% if document.is_starred? %>
                       <%= link_to unstar_document_path(document), 

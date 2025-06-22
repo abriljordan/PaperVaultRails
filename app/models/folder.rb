@@ -13,6 +13,7 @@ class Folder < ApplicationRecord
   
   scope :root_folders, -> { where(parent_id: nil) }
   scope :shared_with, ->(user) { joins(:folder_shares).where(folder_shares: { user: user }) }
+  scope :starred, -> { where(is_starred: true) }
 
   def full_path
     if parent
@@ -32,6 +33,10 @@ class Folder < ApplicationRecord
 
   def is_shared?
     folder_shares.exists?
+  end
+
+  def is_starred?
+    is_starred
   end
 
   def can_access?(user)

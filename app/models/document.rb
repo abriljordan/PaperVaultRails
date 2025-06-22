@@ -11,6 +11,7 @@ class Document < ApplicationRecord
 
   scope :recent, -> { order(created_at: :desc) }
   scope :shared_with, ->(user) { joins(:document_shares).where(document_shares: { user: user }) }
+  scope :starred, -> { where(is_starred: true) }
 
   before_save :set_name_from_file
   before_save :set_file_size
@@ -47,6 +48,10 @@ class Document < ApplicationRecord
 
   def is_shared?
     document_shares.exists?
+  end
+
+  def is_starred?
+    is_starred
   end
 
   def can_access?(user)
