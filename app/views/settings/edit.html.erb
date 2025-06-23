@@ -1,48 +1,59 @@
 <h1 class="text-2xl font-bold mb-6">User Settings</h1>
+
 <%= form_with model: @user, url: settings_path, method: :patch, local: true, html: { multipart: true }, class: "space-y-8 max-w-xl" do |f| %>
-  <div class="flex items-center space-x-8">
-    <% if @user.avatar.attached? %>
-      <img src="<%= url_for(@user.avatar) %>" alt="Avatar" class="h-16 w-16 rounded-full object-cover border" />
-    <% else %>
-      <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-2xl text-gray-400 border">
-        <i class="fas fa-user"></i>
+  <div class="flex items-center">
+    <div data-controller="avatar" class="relative">
+      <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-300 cursor-pointer hover:border-blue-500 transition-colors duration-200" data-action="change->avatar#updateAvatar" style="width: 96px; height: 96px;">
+        <% if @user.avatar.attached? %>
+          <img src="<%= url_for(@user.avatar) %>", alt="Avatar" style="width: 96px; height: 96px; object-fit: cover; border-radius: 50%;" />
+        <% else %>
+          <i class="fas fa-user text-4xl text-gray-400"></i>
+        <% end %>
+        <%= f.file_field :avatar, class: "absolute inset-0 opacity-0 cursor-pointer", accept: "image/*" %>
       </div>
-    <% end %>
-    <div>
-      <%= f.label :avatar, "Profile Photo", class: "block text-sm font-medium text-gray-700" %>
-      <%= f.file_field :avatar, class: "mt-1 block w-full text-sm text-gray-500" %>
+    </div>
+    
+    <div class="ml-16">
+      <div class="space-y-4 p-4">
+        <%= f.label :avatar, "Profile Photo", class: "block mb-2 text-base font-medium text-gray-900" %>
+      </div>
     </div>
   </div>
+
   <div>
-    <%= f.label :name, class: "block text-sm font-medium text-gray-700" %>
-    <%= f.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+    <%= f.label :name, class: "block mb-2 text-base font-medium text-gray-900" %>
+    <%= f.text_field :name, class: "block w-64 border border-gray-300 rounded-md h-10" %>
   </div>
+
   <div>
-    <%= f.label :email, class: "block text-sm font-medium text-gray-700" %>
-    <%= f.email_field :email, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+    <%= f.label :email, class: "block mb-2 text-base font-medium text-gray-900" %>
+    <%= f.email_field :email, class: "block w-64 border border-gray-300 rounded-md h-10" %>
   </div>
+
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div>
-      <%= f.label :password, "New Password", class: "block text-sm font-medium text-gray-700" %>
-      <%= f.password_field :password, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+      <%= f.label :password, "New Password", class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= f.password_field :password, class: "block w-64 border border-gray-300 rounded-md h-10" %>
     </div>
+
     <div>
-      <%= f.label :password_confirmation, class: "block text-sm font-medium text-gray-700" %>
-      <%= f.password_field :password_confirmation, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+      <%= f.label :password_confirmation, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= f.password_field :password_confirmation, class: "block w-64 border border-gray-300 rounded-md h-10" %>
     </div>
   </div>
+  
   <div class="space-y-2">
     <h2 class="text-lg font-semibold text-gray-900 mb-2">Notifications</h2>
     <div class="flex items-center">
       <%= f.check_box :notify_on_share, class: "mr-2" %>
-      <%= f.label :notify_on_share, "Email me when a file or folder is shared with me", class: "text-sm text-gray-700" %>
+      <%= f.label :notify_on_share, "Email me when a file or folder is shared with me", class: "text-sm text-gray-400" %>
     </div>
     <div class="flex items-center">
       <%= f.check_box :notify_on_comment, class: "mr-2" %>
-      <%= f.label :notify_on_comment, "Email me when someone comments on my file", class: "text-sm text-gray-700" %>
+      <%= f.label :notify_on_comment, "Email me when someone comments on my file", class: "text-sm text-gray-400" %>
     </div>
   </div>
   <div>
-    <%= f.submit "Update Settings", class: "bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" %>
+    <%= f.submit "Update Settings", class: "bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-400" %>
   </div>
 <% end %> 
