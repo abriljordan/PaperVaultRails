@@ -48,7 +48,7 @@ gem "pundit", "~> 2.3"  # Authorization
 gem "acts_as_tree", "~> 2.9"  # Folder hierarchy
 gem "mime-types", "~> 3.4"  # File type detection
 gem "rubyzip", "~> 2.3"  # ZIP file handling
-gem "aws-sdk-s3", "~> 1.0", require: false  # Optional: S3 storage
+gem "aws-sdk-s3", "~> 1.191", require: false  # Optional: S3 storage
 gem "kaminari", "~> 1.2"  # Pagination
 gem "ransack", "~> 4.1"  # Search functionality
 
